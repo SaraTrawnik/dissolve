@@ -1,0 +1,189 @@
+#!/usr/bin/ruby
+
+	class Dissolver
+
+		attr_accessor :this
+
+		## @brief      working in goal mode
+		def self.goal input
+
+			# goal mode
+			case input
+
+				when "list"
+
+					# list goals
+					Dir.entries(@this["datadir"]).each do |file|
+
+						if file[-4..file.length] == ".dat"
+
+							p file
+						end
+					end
+
+				else
+
+					if input.length > 1
+
+						# make & use new goal
+						newgoal = input.scan(/\w+/).first
+
+						p "using #{newgoal} instead of #{@this["goalname"]}"
+						@this["goalname"] = newgoal
+
+						# set goal
+						File.open "#{@this["datadir"]}/goal", "w" do |f|
+							f.write newgoal
+							f.close
+						end
+
+						@this["update"] = true
+					else
+
+						# print out current goal
+						p "Current goal is #{@this["goalname"]}."
+					end
+			end
+		end
+
+		## @brief      working in problem mode
+		def self.problem input
+
+			case input
+
+				when "list"
+
+					# list (last 5) problems
+					fin = @this['data'].count - 1
+					p @this['data'][fin - 5, fin]
+
+				when "solved"
+
+					# solve current problem
+					@this['data'][current][3] = true
+					p @this['data'][current]
+
+					@this["update"] = true
+				else
+
+					if input.length > 1
+
+						# make & use new problem
+						@this['data'] << neu(input, current)
+
+						@this["update"] = true
+					end
+					
+					# print out current problem
+					p @this['data'][current]
+			end
+
+		end
+
+		## @brief      route user requests
+		def self.route
+
+			# parse user input
+			instruction = ARGV[0]
+			input = String.new
+
+			if ARGV.count > 1
+				
+				input = ARGV[1..(ARGV.length - 1)].join ' '
+			end
+
+			# route user input
+			case instruction
+
+				when "goal"
+
+					goal input
+
+				when "problem"
+
+					problem input
+
+				when "-h", "--help", "help"
+
+					# help
+					puts File.read("./README.md")
+
+				else
+
+					puts "Undefined command #{instruction || 'whitespace'}, try --help to see a list of commands."
+			end
+		end
+
+		## @brief      init
+		def self.init
+
+			setup
+			route
+
+			update # datfile
+		end
+
+		## @brief      create/load necessary data
+		def self.setup
+
+			@this =
+			{
+				"datadir" => "#{`echo $HOME`.chomp}/.config/chunks",
+				"udpate" => false
+			}
+
+			# init data dir
+			if !Dir.exist?(@this["datadir"])
+				Dir.mkdir(@this["datadir"])
+			end
+
+			# init goalfile
+			if !File.file?("#{@this["datadir"]}/goal")
+				File.open "#{@this["datadir"]}/goal", "w" do |f|
+					f.write "default"
+					f.close
+				end
+			end
+
+			# define program state
+			@this["goalname"] = File.read("#{@this["datadir"]}/goal")
+			@this["goalfile"] = "#{@this["datadir"]}/#{@this["goalname"]}.dat"
+			@this["data"] = File.file?(@this["goalfile"]) ?
+					Marshal.load(File.read(@this["goalfile"])) : [neu("entry")]
+		end
+
+		## @brief      save changes to datfile
+		def self.update
+
+			if @this["update"]
+
+				File.open "#{@this["datadir"]}/#{@this["goalname"]}.dat", "w" do |f|
+					f.write Marshal.dump(@this["data"])
+					f.close
+				end
+
+				puts "Updated."				
+			end
+		end
+
+		## @brief      return current problem
+		def self.current
+
+			for i in (@this["data"].length - 1).downto(0)
+
+				if @this["data"][i][3] == false
+
+					return i
+				end
+			end
+		end
+
+		## @brief      build a problem
+		def self.neu desc, parent = 0, time = Time.new.to_i, solved = false
+
+			return [parent, time, desc, solved]
+		end
+
+	end
+
+	Dissolver::init
