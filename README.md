@@ -3,6 +3,10 @@
  
  a tiny task chunking command line tool.
 
+### INSTALLATION:
+
+ add it to your PATH
+
 ### USAGE:
    dissolve [INSTRUCTION [INPUT]]
 
