@@ -53,9 +53,23 @@
 
 				when "list"
 
-					# list (last 5) problems
-					fin = @this['data'].count - 1
-					p @this['data'][fin - 5, fin]
+					ancestor = current
+					depth = 4
+					while depth > 0
+
+						if @this['data'][ancestor]
+
+							ancestor = @this['data'][ancestor].first || 0
+						end
+
+						depth -= 1
+					end
+
+					puts tree ancestor
+
+					# list problem branch
+					#fin = @this['data'].count - 1
+					#p @this['data'][fin - 5, fin]
 
 				when "solved"
 
@@ -162,7 +176,7 @@
 					f.close
 				end
 
-				puts "Updated."				
+				puts "Updated."
 			end
 		end
 
@@ -183,6 +197,28 @@
 
 			return [parent, time, desc, solved]
 		end
+
+		## @brief      build a tree-like output of the data
+		def self.tree (origin, depth = 0, more = false)
+
+			text = String.new
+			children = @this['data'].select {|entry| entry[0] == origin && @this['data'].index(entry) != origin}.sort_by{|entry|entry[1]}
+
+			spacer = ' '*((depth)*4)
+			text << spacer
+
+			graphic = more ? "├" : "└"
+			text << "#{graphic}── #{@this['data'][origin][2]}\n"
+
+			depth += 1
+			for i in (0..children.count - 1)
+
+				text << tree(@this['data'].index(children[i]), depth, (children.count > 1 && i != (children.count - 1)))
+			end
+
+			return text
+		end
+
 
 	end
 
