@@ -195,7 +195,6 @@
 		## @brief      return current problem
 		def self.current
 
-			p @this['data']
 			for i in (@this['data'].length - 1).downto(0)
 
 				if @this['data'][i][3] == false
