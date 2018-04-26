@@ -13,7 +13,7 @@
 				when "list"
 
 					# list goals
-					Dir.entries(@this["datadir"]).each do |file|
+					Dir.entries(@this['datadir']).each do |file|
 
 						if file[-4..file.length] == ".dat"
 
@@ -28,20 +28,22 @@
 						# make & use new goal
 						newgoal = input.scan(/\w+/).first
 
-						p "using #{newgoal} instead of #{@this["goalname"]}"
-						@this["goalname"] = newgoal
+						p "using #{newgoal} instead of #{@this['goalname']}"
+						@this['goalname'] = newgoal
 
 						# set goal
-						File.open "#{@this["datadir"]}/goal", "w" do |f|
+						File.open "#{@this['datadir']}/goal", "w" do |f|
 							f.write newgoal
 							f.close
 						end
 
-						@this["update"] = true
+						# initialize datfile
+						@this['data'] = [neu('entry')]
+						@this['update'] = true
 					else
 
 						# print out current goal
-						p "Current goal is #{@this["goalname"]}."
+						p "Current goal is #{@this['goalname']}."
 					end
 			end
 		end
@@ -77,7 +79,7 @@
 					@this['data'][current][3] = true
 					p @this['data'][current]
 
-					@this["update"] = true
+					@this['update'] = true
 				else
 
 					if input.length > 1
@@ -85,7 +87,7 @@
 						# make & use new problem
 						@this['data'] << neu(input, current)
 
-						@this["update"] = true
+						@this['update'] = true
 					end
 					
 					# print out current problem
@@ -113,9 +115,17 @@
 
 					goal input
 
+				when "goals"
+
+					goal "list"
+
 				when "problem"
 
 					problem input
+
+				when "problems"
+
+					problem "list"
 
 				when "-h", "--help", "help"
 
@@ -147,32 +157,34 @@
 			}
 
 			# init data dir
-			if !Dir.exist?(@this["datadir"])
-				Dir.mkdir(@this["datadir"])
+			if !Dir.exist?(@this['datadir'])
+				Dir.mkdir(@this['datadir'])
 			end
 
 			# init goalfile
-			if !File.file?("#{@this["datadir"]}/goal")
-				File.open "#{@this["datadir"]}/goal", "w" do |f|
+			if !File.file?("#{@this['datadir']}/goal")
+				File.open "#{@this['datadir']}/goal", "w" do |f|
 					f.write "default"
 					f.close
 				end
 			end
 
 			# define program state
-			@this["goalname"] = File.read("#{@this["datadir"]}/goal")
-			@this["goalfile"] = "#{@this["datadir"]}/#{@this["goalname"]}.dat"
-			@this["data"] = File.file?(@this["goalfile"]) ?
-					Marshal.load(File.read(@this["goalfile"])) : [neu("entry")]
+			@this['goalname'] = File.read("#{@this['datadir']}/goal")
+			@this['goalfile'] = "#{@this['datadir']}/#{@this['goalname']}.dat"
+
+			@this['data'] = # File.file?(@this['goalfile']) ?
+					Marshal.load(File.read(@this['goalfile']))
+					# : [neu("entry")]
 		end
 
 		## @brief      save changes to datfile
 		def self.update
 
-			if @this["update"]
+			if @this['update']
 
-				File.open "#{@this["datadir"]}/#{@this["goalname"]}.dat", "w" do |f|
-					f.write Marshal.dump(@this["data"])
+				File.open "#{@this['datadir']}/#{@this['goalname']}.dat", "w" do |f|
+					f.write Marshal.dump(@this['data'])
 					f.close
 				end
 
@@ -183,9 +195,10 @@
 		## @brief      return current problem
 		def self.current
 
-			for i in (@this["data"].length - 1).downto(0)
+			p @this['data']
+			for i in (@this['data'].length - 1).downto(0)
 
-				if @this["data"][i][3] == false
+				if @this['data'][i][3] == false
 
 					return i
 				end
