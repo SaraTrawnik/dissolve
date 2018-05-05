@@ -4,6 +4,19 @@
 
 		attr_accessor :this
 
+		## @brief		get goal file
+		def self.goalfile filename = @this['goalname']
+
+			#filename = filename || @this['goalname']
+			"#{@this['datadir']}/#{filename}.dat"
+		end
+
+		## @brief 		load or init
+		def self.goal_or_new filename
+
+			return File.file?(filename) ? Marshal.load(File.read(filename)) : [neu('entry')]
+		end
+
 		## @brief      working in goal mode
 		def self.goal input
 
@@ -38,7 +51,7 @@
 						end
 
 						# initialize datfile
-						@this['data'] = [neu('entry')]
+						@this['data'] = goal_or_new(goalfile)
 						@this['update'] = true
 					else
 
@@ -171,11 +184,8 @@
 
 			# define program state
 			@this['goalname'] = File.read("#{@this['datadir']}/goal")
-			@this['goalfile'] = "#{@this['datadir']}/#{@this['goalname']}.dat"
 
-			@this['data'] = # File.file?(@this['goalfile']) ?
-					Marshal.load(File.read(@this['goalfile']))
-					# : [neu("entry")]
+			@this['data'] = goal_or_new(goalfile)
 		end
 
 		## @brief      save changes to datfile
@@ -183,7 +193,7 @@
 
 			if @this['update']
 
-				File.open "#{@this['datadir']}/#{@this['goalname']}.dat", "w" do |f|
+				File.open goalfile, "w" do |f|
 					f.write Marshal.dump(@this['data'])
 					f.close
 				end
