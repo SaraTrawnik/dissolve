@@ -1,5 +1,19 @@
 #!/usr/bin/ruby
 
+	# for output
+	class String
+
+		def black;          "\e[30m#{self}\e[0m" end
+		def red;            "\e[31m#{self}\e[0m" end
+		def green;          "\e[32m#{self}\e[0m" end
+		def brown;          "\e[33m#{self}\e[0m" end
+		def blue;           "\e[34m#{self}\e[0m" end
+		def magenta;        "\e[35m#{self}\e[0m" end
+		def cyan;           "\e[36m#{self}\e[0m" end
+		def gray;           "\e[37m#{self}\e[0m" end
+	end
+
+	# teh program
 	class Dissolver
 
 		attr_accessor :this
@@ -39,7 +53,7 @@
 					if input.length > 1
 
 						# make & use new goal
-						newgoal = input.scan(/\w+/).first
+						newgoal = URI.escape(input)
 
 						p "using #{newgoal} instead of #{@this['goalname']}"
 						@this['goalname'] = newgoal
@@ -64,48 +78,78 @@
 		## @brief      working in problem mode
 		def self.problem input
 
-			case input
+			instruction = input.scan(/\w+/).first
+
+			case instruction
 
 				when "list"
 
-					ancestor = current
-					depth = 4
-					while depth > 0
-
-						if @this['data'][ancestor]
-
-							ancestor = @this['data'][ancestor].first || 0
-						end
-
-						depth -= 1
-					end
-
-					puts tree ancestor
-
-					# list problem branch
-					#fin = @this['data'].count - 1
-					#p @this['data'][fin - 5, fin]
+					problem_tree
 
 				when "solved"
 
+					if current == 0
+
+						puts "Currently at entry point."
+						return
+					end
+
+					audionotification 'ok.mp3'
+					
+					# note the solution
+					solution = input.sub(instruction, '').strip
+					if solution.length > 1
+
+						@this['data'][current][4] = solution
+					end
+
 					# solve current problem
 					@this['data'][current][3] = true
-					p @this['data'][current]
+					
+					# print out problems
+					problem_tree
 
 					@this['update'] = true
 				else
 
 					if input.length > 1
 
-						# make & use new problem
-						@this['data'] << neu(input, current)
+						# find existing
+						existing = @this['data'].find_index{|entry| entry[2] == input}
+						
+						if existing != nil
+
+							@this['data'][existing][3] = false
+						else
+
+							# make & use new problem
+							@this['data'] << neu(input, current)
+						end
 
 						@this['update'] = true
 					end
 					
-					# print out current problem
-					p @this['data'][current]
+					# print out the list
+					problem_tree
 			end
+		end
+
+		## @brief		problem overview
+		def self.problem_tree depth = 4
+
+			ancestor = current
+			depth = 4
+			while depth > 0
+
+				if @this['data'][ancestor]
+
+					ancestor = @this['data'][ancestor].first || 0
+				end
+
+				depth -= 1
+			end
+
+			puts tree ancestor
 
 		end
 
@@ -230,7 +274,13 @@
 			text << spacer
 
 			graphic = more ? "├" : "└"
-			text << "#{graphic}── #{@this['data'][origin][2]}\n"
+
+			solved = @this['data'][origin][3] ? "✓" : ""
+			solution = @this['data'][origin][4] || ""
+
+			prepared = "#{graphic}── #{@this['data'][origin][2]}#{solved} #{solution}\n"
+			prepared = origin == current ? prepared.red : prepared
+			text << prepared
 
 			depth += 1
 			for i in (0..children.count - 1)
@@ -241,7 +291,17 @@
 			return text
 		end
 
+		def self.audionotification file
 
+			['mpv', 'mplayer', 'vlc'].each do |program|
+
+				if `which #{program}`.chomp.length > 0
+
+					`#{program} #{file}`
+					break
+				end
+			end
+		end
 	end
 
 	Dissolver::init
