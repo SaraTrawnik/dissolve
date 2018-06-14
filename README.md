@@ -1,5 +1,7 @@
 # Dissolver, 
- a tiny task chunking command line tool.
+a tiny task chunking command line tool.
+
+Project updates at https://medium.com/@Apoc.
 
 ## INSTALLATION:
 personally I've aliased it in ~/.bashrc
@@ -9,26 +11,34 @@ dissolve [INSTRUCTION [INPUT]]
 
 ### INSTRUCTIONS:
 >help (-h, --help)
-shows this help message
+>
+>shows this help message
 
 >goal
-shows current goal
+>
+>shows current goal
 
 >problem
-shows current problem
+>
+>shows current problem
 
 ### INPUTS
 >(goal) list
-shows a list of goals
+>
+>shows a list of goals
 
 >(goal) "your input"
-switches to and creates new "your%20input.dat" goal datfile
+>
+>switches to and creates new "your%20input.dat" goal datfile
 
 >(problem) list
-shows a list of problems
+>
+>shows a list of problems
 
 >(problem) "your input"
-switches to and creates new goal problem/subproblem
+>
+>switches to and creates new goal problem/subproblem
 
 >(problem) solved
-marks current problem as solved and goes up a level
+>
+>marks current problem as solved and goes up a level
