@@ -52,6 +52,7 @@
 
 					if input.length > 1
 
+						require 'uri'
 						# make & use new goal
 						newgoal = URI.escape(input)
 
@@ -94,7 +95,8 @@
 						return
 					end
 
-					audionotification 'ok.mp3'
+					# not yet	
+					# audionotification 'ok.mp3'
 					
 					# note the solution
 					solution = input.sub(instruction, '').strip
