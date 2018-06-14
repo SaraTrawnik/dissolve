@@ -8,27 +8,27 @@ personally I've aliased it in ~/.bashrc
 dissolve [INSTRUCTION [INPUT]]
 
 ### INSTRUCTIONS:
-* help (-h, --help)
+>help (-h, --help)
 shows this help message
 
-* goal
+>goal
 shows current goal
 
-* problem
+>problem
 shows current problem
 
 ### INPUTS
-* (goal) list
+>(goal) list
 shows a list of goals
 
-* (goal) "your input"
+>(goal) "your input"
 switches to and creates new "your%20input.dat" goal datfile
 
-* (problem) list
+>(problem) list
 shows a list of problems
 
-* (problem) "your input"
+>(problem) "your input"
 switches to and creates new goal problem/subproblem
 
-* (problem) solved
+>(problem) solved
 marks current problem as solved and goes up a level
