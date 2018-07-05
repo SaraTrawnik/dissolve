@@ -70,41 +70,40 @@ def workInGoalM(inp): # functions: change current goal, list goals, print curren
   if inp[0] == "list": 
     entries = [ x for x in os.listdir(this['datadir']) if ".dat" in x]
     print('\n'.join(entries))
-  elif inp[0] == "new": 
-    initGoal( inp[1] )
-    initGoalfile( inp[1] )
   elif inp[0] == "del": 
     os.remove( this['datadir']+"/"+inp[1]+".dat" )
     initGoalfile("default")
-  elif inp[0] == "curr":
+  elif inp[0] == "":
     print("current goal you are working on is "+fetchCurrentProblem())
   elif len(inp) == 1: 
-    initGoalfile( inp[0] )
-  else:
-    print("bad input, use dissolve help to check args")
+    if os.path.exists( this['datadir']+inp[0]+".dat" ):
+      initGoalfile( inp[0] )
+    else:
+      initGoal( inp[0] )
+      initGoalfile( inp[0] )
 
 def workInProblemM(inp): # functions: add a problem and remove a problem ( <= change this['update'] to True ), list problems
   if len(inp) == 2: 
     this['update'] = True
     newInstance( this['data'], inp[0], inp[1])
-  elif inp[0] == "list": 
+  elif inp[0] == "": 
     showInstance( this['data'] )
   elif len(inp) == 1: 
     this['update'] = True
     delInstance( this['data'], inp[0], this['data'] )
-  else:
-    print("bad input, use 'dissolve help' to check args")
 
-def help(parameterThatDoesNothing): # functions: print instructions
+def helpP(parameterThatDoesNothing): # functions: print instructions
   with open("./readme.md", 'r') as f:
     print( f.read() )
 
 def route(inp):
-  choice = { "goal": workInGoalM, "problem": workInProblemM, "help": help } 
+  choice = { "goal": workInGoalM, "problem": workInProblemM, "help": helpP } 
   try:
     choice[ inp[0] ]( inp[1:] )
+  except IndexError:
+    choice[ inp[0] ]( [''] )
   except KeyError:
-    print("Invalid instruction, try help")
+      print("bad input, use dissolve help")
 
 ### creating data structure
 
