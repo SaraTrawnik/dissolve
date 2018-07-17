@@ -10,35 +10,31 @@ personally I've aliased it in ~/.bashrc
 dissolve [INSTRUCTION [INPUT]]
 
 ### INSTRUCTIONS:
->help (-h, --help)
+>help 
 >
 >shows this help message
 
 >goal
 >
->shows current goal
+>shows list of goals
 
 >problem
 >
->shows current problem
+>shows list of problems
 
 ### INPUTS
->(goal) list
->
->shows a list of goals
-
 >(goal) "your input"
 >
->switches to and creates new "your%20input.dat" goal datfile
+>switches to and creates new "your input.dat" goal datfile
 
->(problem) list
+>(goal) del "your input"
 >
->shows a list of problems
+>deletes your current problem and defaults to default.dat
 
 >(problem) "your input"
 >
->switches to and creates new goal problem/subproblem
+>deletes "your input" subproblem
 
->(problem) solved
+>(problem) "your input" "other input"
 >
->marks current problem as solved and goes up a level
+>creates new subproblem "other input" under "your input"
